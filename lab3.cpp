@@ -4,7 +4,7 @@
  * Простейшие алгоритмы сортировки и поиска. Сложные указатели.
  */
 
-#include <string>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <cstdlib>
@@ -770,38 +770,55 @@ void printText() {
 
     while (word != nullptr) {
         int wordLen = strlen(word);
-
-        // если слово длиннее 40 печатаем его частями
-        while (wordLen > MAX_LINE_LENGTH) {
-            if (strlen(current_line) > 0) {
-                printRow(current_line, MAX_LINE_LENGTH, is_first, false);
-                is_first = false;
-                current_line[0] = '\0'; // очищаем строку
-            }
-
-            char chunk[41];
-            strncpy(chunk, word, MAX_LINE_LENGTH);
-            chunk[MAX_LINE_LENGTH] = '\0';
-            printRow(chunk, MAX_LINE_LENGTH, is_first, false);
-            is_first = false;
-
-            word += MAX_LINE_LENGTH; // сдвигаем указатель в слове
-            wordLen = strlen(word);
-        }
-
-        // проверяем влезет ли слово в текущую строку
         int currentLen = strlen(current_line);
         int space = (currentLen == 0) ? 0 : 1;
 
-        if (currentLen + space + wordLen <= MAX_LINE_LENGTH) {
-            if (currentLen > 0) strcat(current_line, " ");
-            strcat(current_line, word);
+        // если слово больше 40 символов
+        if (wordLen > MAX_LINE_LENGTH) {
+            // считаем сколько места осталось в текущей строке
+            int free_space = MAX_LINE_LENGTH - currentLen - space;
+
+            // если есть место откусываем кусок от длинного слова
+            if (free_space > 0) {
+                if (space) strcat(current_line, " ");
+                strncat(current_line, word, free_space); // копируем free_space символов
+                word += free_space; // сдвигаем указатель в слове 
+                wordLen = strlen(word);
+            }
+
+            // печатаем что набралось (полную строку)
+            if (strlen(current_line) > 0) {
+                printRow(current_line, MAX_LINE_LENGTH, is_first, false);
+                is_first = false;
+                current_line[0] = '\0';
+            }
+
+            // делим оставшийся кусок слова на блоки по 40
+            while (wordLen > MAX_LINE_LENGTH) {
+                char chunk[41];
+                strncpy(chunk, word, MAX_LINE_LENGTH);
+                chunk[MAX_LINE_LENGTH] = '\0';
+                printRow(chunk, MAX_LINE_LENGTH, is_first, false);
+                is_first = false;
+
+                word += MAX_LINE_LENGTH;
+                wordLen = strlen(word);
+            }
+            // остаток слова который меньше 40 копируем в начало новой строки
+            strcpy(current_line, word);
         }
         else {
-            //  не влезло => печатаем и начинаем заново
-            printRow(current_line, MAX_LINE_LENGTH, is_first, false);
-            is_first = false;
-            strcpy(current_line, word);
+            // для коротких слов
+            if (currentLen + space + wordLen <= MAX_LINE_LENGTH) {
+                if (currentLen > 0) strcat(current_line, " ");
+                strcat(current_line, word);
+            }
+            else {
+                // не влезло => печатаем строку и берем слово в новую
+                printRow(current_line, MAX_LINE_LENGTH, is_first, false);
+                is_first = false;
+                strcpy(current_line, word);
+            }
         }
 
         word = strtok(nullptr, " "); // берем следующее слово
