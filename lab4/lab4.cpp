@@ -189,8 +189,11 @@ int main()
         cout << MinArrTwoLayer(arr_two_l, rows, cols) << endl;
 
         delete[] row_1;
+        row_1 = nullptr;
         delete[] row_2;
+        row_2 = nullptr;
         delete[] row_3;
+        row_3 = nullptr;
         /** 
          * Покажите, как можно использовать эту функцию для встроенных
          * двумерных массивов.
@@ -303,15 +306,17 @@ int main()
          */
         int nDayTab[2][12] = {
             {31,28,31,30,31,30,31,31,30,31,30,31}, //невисокосный год
-            {31,29,31,30,31,30,31,31,30,31,30,31}};  //високосный год
+            {31,29,31,30,31,30,31,31,30,31,30,31} //високосный год
+        };  
 
         /** Вызов функции DayOfYear */
         cout << "23 октября 2005: " << day_of_year(23, 10, 2005, nDayTab) << endl;
 
         /** Проверка результата обратной функцией DayOfMonth */
         auto result = day_of_month_pair(296, 2005, nDayTab);
-        cout << "296-й день 2005 года:" << result.first << " день " << result.second << " месяц" << endl; // .first и .second это обращения к полям структры std::pair
-
+        if (result.first != -1) {
+            cout << "296-й день 2005 года:" << result.first << " день " << result.second << " месяц" << endl; // .first и .second это обращения к полям структры std::pair
+        }
     }
 
     /**
@@ -348,6 +353,7 @@ int main()
         /** печать массива на экран */
         print_array(arr, size);
         delete[] arr;
+        arr = nullptr;
         /**
          * Тут должно быть не более 10 + n элементов, так как во втором цикле
          * могут быть получены только 10 разных вариантов.
@@ -670,7 +676,6 @@ void var_args(int first, ...) {
         }
     }
 
-
     cout << "всего аргументов: " << count << endl;
 
     va_end(args); // завершаем работу со списком аргументов
@@ -700,7 +705,6 @@ int* my_min(int* arr, int size) {
 int encoded32_size(int raw_size) {
     if (raw_size <= 0) return 0;
     // каждые 5 байт (40 бит) превращаются в 8 символов (40 бит)
-    // формула: (биты + 4) / 5, чтобы округлить вверх
     return (raw_size * 8 + 4) / 5;
 }
 int decoded32_size(int encode_size) { 
@@ -823,5 +827,7 @@ void test(const char* test_str) {
 
     // чистим память
     delete[] encoded;
+    encoded = nullptr;
     delete[] decoded;
+    decoded = nullptr;
 }
