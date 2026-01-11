@@ -512,6 +512,7 @@ int main()
         // очень важный этап: возвращаем системе всю память, которую занимали
         for (int i = 0; i < numStrings; ++i) {
             delete[] cPointers[i]; // удаляем каждую строку отдельно
+            cPointers[i] = nullptr;
         }
     }
 
