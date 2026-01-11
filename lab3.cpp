@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void printRow(const string& text, int maxLen, bool isFirst, bool isLast);
+void printRow(const char* text, int maxLen, bool isFirst, bool isLast);
 void printText();
 void printArt();
 void shiftStarsInRow(char row[], int length);
@@ -134,6 +134,7 @@ int main()
     { {3}, {}, {} }
     };
     // оставшиеся ячейки инициализируются нулями
+
     /**
      * Задание 1.5. Инициализация массивов строковыми литералами.
      * 
@@ -241,15 +242,18 @@ int main()
         }
         cout << "Среднее значение для каждой строки: \n";
         for (int i = 0; i < X; ++i) { // выводим среднее значение для каждой строки массива
-            cout << "Среднее значение строки" << i + 1 << ": "odnmassive[i] << endl;
+            cout << "Среднее значение строки" << i + 1 << ": " << odnmassive[i] << endl;
         }
 
         delete[] odnmassive;
+        odnmassive = nullptr;
         // освобождение выделенной памяти
         for (int i = 0; i < X; ++i) {
-            delete[] randmassive[i]; // освобождаем память для каждой строки
+            delete[] randmassive[i];
+            randmassive[i] = nullptr;// освобождаем память для каждой строки
         }
         delete[] randmassive; // освобождаем память для массива указателей
+        randmassive = nullptr;
 
         /**
          * Задание 2.4.
@@ -287,9 +291,8 @@ int main()
     cout << "Введите количество чисел: ";
     cin >> amount;
     if (amount >= 0) {
-
         int* am_massive = new int[amount];
-        int currentsize = 0; // количество чисел которые уже введены
+        int currentsize = 0; // количество чисел которые уже ввели
         cout << "Введите числа: \n";
         for (int i = 0; i < amount; ++i) {
             int num;
@@ -299,11 +302,13 @@ int main()
                 am_massive[j + 1] = am_massive[j]; // если введенный элемент больше последнего то последний сдвигается
                 --j; // уменьшаем, чтобы перейти к след элементу влево
             }
-            am_massive[j + 1] = num; // j указ на эл, который <= num вставляем num на нужное место
-            ++currentsize; // увеличиваем тк увеличивается коолво num
+            am_massive[j + 1] = num; // j указ на эл который <= num вставляем num на нужное место
+            ++currentsize; // увеличиваем тк увеличивается кол-во num
         }
         delete[] am_massive;
+        am_massive = nullptr;
     }
+
     /**
      * Задание 3.2. Простой поиск.
      *
@@ -341,6 +346,7 @@ int main()
 
         }
         delete[] am_massive;
+        am_massive = nullptr;
     }
      
     /**
@@ -396,12 +402,10 @@ int main()
 
         {
             /** ввод строки в массив cBuffer: */
-
             while (nIndex < N) { // цикл продолжается пока не будет введено максимальное количество строк.
                 cout << "Введите строку (или * для завершения):  " << (nIndex + 1) << ": ";
                 cin.getline(cBuffer[nIndex], M); // чтение строки
                 // считывает строку из ввода и сохраняет ее в массиве cBuffer по текущему индексу.
-
             /** если введена строка - признак окончания, то выйти из цикла */
                 if (strcmp(cBuffer[nIndex], STOP_STRING) == 0) { // сравнивает введенную строку с STOP_STRING
                     break; // прекращение ввода при вводе '*'
@@ -410,9 +414,7 @@ int main()
                 cPointers[nIndex] = cBuffer[nIndex]; // устанавливает указатель в массиве 
                 ++nIndex; // переход к следующему индексу
             }
-
             /** указатель на строку с номером nIndex в массиве cBuffer */
-
         }
 
         /** Выдать диагностику о том, что прием строк завершен.*/
@@ -468,7 +470,7 @@ int main()
 
         cout << "введите количество строк: ";
         cin >> numStrings;
-        cin.ignore(); // убираем из буфера лишний enter, чтобы он не испортил ввод строк
+        cin.ignore(); // убираем из буфера лишний enter чтобы он не испортил ввод строк
 
         // проверяем, не слишком ли много строк попросил пользователь
         if (numStrings > MAX_STRINGS) {
@@ -701,13 +703,11 @@ int main()
         for (int j = 0; j < COLS; ++j) {
             int starCount = 0; // чтобы подсчитывать количество символов * в текущем столбце
 
-
             for (int i = 0; i < ROWS; ++i) {
                 if (array[i][j] == '*') {
                     ++starCount;
                 }
             } // цикл проходит по всем строкам текущего столбца и увеличивает starCount, если найден символ *
-
 
             for (int i = 0; i < ROWS; ++i) {
                 array[i][j] = (i >= ROWS - starCount) ? '*' : '_';
@@ -728,91 +728,87 @@ int main()
     return 0;
 }
 
+void printRow(const char* text, int maxLen, bool isFirst, bool isLast) {
+    const char* left;
+    const char* right;
 
-void printRow(const string& text, int maxLen, bool isFirst, bool isLast) {
-    string left, right;
-
-    // выбираем вид скобок в зависимости от того, где находится строка
     if (isFirst && isLast) {
-        left = "| "; right = " |"; // если в тексте всего одна строка
+        left = "| "; right = " |"; 
     }
     else if (isFirst) {
-        left = "/ "; right = " \\"; // для самой первой строки
+        left = "/ "; right = " \\";
     }
-    else if (isLast) {
-        left = "\\ "; right = " /"; // для самой последней строки
+    else if (isLast) { 
+        left = "\\ "; right = " /";
     }
-    else {
-        left = "| "; right = " |"; // для средних строк
+    else { 
+        left = "| "; right = " |"; 
     }
 
     cout << left << text;
 
-    // дописываем пробелы справа, чтобы рамка была ровной
-    for (int i = text.length(); i < maxLen; ++i) {
+    for (int i = strlen(text); i < maxLen; ++i) { 
         cout << " ";
     }
-
     cout << right << endl;
 }
 
-
 void printText() {
     const int MAX_LINE_LENGTH = 40;
-    string input_line, current_line;
+    const int MAX_TEXT_LENGTH = 500;
+    char input_line[MAX_TEXT_LENGTH]; // буфер для ввода текста
+    char current_line[41] = ""; // буфер для текущей строки (+1 для /0)
     bool is_first = true;
 
-    if (!getline(cin, input_line)) return;
+    if (!cin.getline(input_line, MAX_TEXT_LENGTH)) {
+        return;
+    }
 
     cout << " _________________________________________" << endl;
 
-    size_t start = 0; // начало слова
-    size_t end = 0;   // конец слова
+    char* word = strtok(input_line, " "); // strtok чтобы разбивать строку на слова по пробелам
 
-    while (start < input_line.length()) {
-        // ищем, где заканчивается слово (пробел или конец строки)
-        end = input_line.find(' ', start);
-        if (end == string::npos) end = input_line.length();
+    while (word != nullptr) {
+        int wordLen = strlen(word);
 
-        // вырезаем само слово
-        string word = input_line.substr(start, end - start);
-
-        // если в строке было много пробелов подряд, пропускаем пустоту
-        if (word.empty()) {
-            start = end + 1;
-            continue;
-        }
-
-        // если слово само по себе длиннее 40 символов
-        while (word.length() > MAX_LINE_LENGTH) {
-            if (!current_line.empty()) {
+        // если слово длиннее 40 печатаем его частями
+        while (wordLen > MAX_LINE_LENGTH) {
+            if (strlen(current_line) > 0) {
                 printRow(current_line, MAX_LINE_LENGTH, is_first, false);
                 is_first = false;
-                current_line = "";
+                current_line[0] = '\0'; // очищаем строку
             }
-            printRow(word.substr(0, MAX_LINE_LENGTH), MAX_LINE_LENGTH, is_first, false);
+
+            char chunk[41];
+            strncpy(chunk, word, MAX_LINE_LENGTH);
+            chunk[MAX_LINE_LENGTH] = '\0';
+            printRow(chunk, MAX_LINE_LENGTH, is_first, false);
             is_first = false;
-            word = word.substr(MAX_LINE_LENGTH);
+
+            word += MAX_LINE_LENGTH; // сдвигаем указатель в слове
+            wordLen = strlen(word);
         }
 
-        // проверяем, влезет ли слово в текущую строку
-        int space = current_line.empty() ? 0 : 1;
-        if (current_line.length() + space + word.length() <= MAX_LINE_LENGTH) {
-            if (!current_line.empty()) current_line += " ";
-            current_line += word;
+        // проверяем влезет ли слово в текущую строку
+        int currentLen = strlen(current_line);
+        int space = (currentLen == 0) ? 0 : 1;
+
+        if (currentLen + space + wordLen <= MAX_LINE_LENGTH) {
+            if (currentLen > 0) strcat(current_line, " ");
+            strcat(current_line, word);
         }
         else {
-            // если не влезло, печатаем старую строку и берем слово в новую
+            //  не влезло => печатаем и начинаем заново
             printRow(current_line, MAX_LINE_LENGTH, is_first, false);
             is_first = false;
-            current_line = word;
+            strcpy(current_line, word);
         }
 
-        start = end + 1; // переходим к следующему слову
+        word = strtok(nullptr, " "); // берем следующее слово
     }
 
-    // выводим то, что осталось в самом конце
-    if (!current_line.empty()) {
+    // выводим остаток в конце
+    if (strlen(current_line) > 0) {
         printRow(current_line, MAX_LINE_LENGTH, is_first, true);
     }
 
