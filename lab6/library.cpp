@@ -1,0 +1,427 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include "library.h"
+
+#define MAX_UNDO 10
+static Library* history[MAX_UNDO] = { nullptr };
+static int history_count = 0;
+
+
+
+Library* createLib() {
+	Library* lib = new Library();
+
+	lib->count = 0;
+	lib->capacity = 1;
+
+	lib->books = new Book[lib->capacity];
+
+	return lib; 
+}
+
+void reserveMemory(Library* lib) {
+	if (lib->count >= lib->capacity) {
+		int new_capacity = lib->capacity + lib->capacity / 2 + 1;
+		Book* temp_arr = new Book[new_capacity];
+
+		for (int i = 0; i < lib->count; ++i) { // переносим данные во временное "хранилище"
+			temp_arr[i] = lib->books[i];
+		}
+
+		delete[] lib->books;
+
+		lib->books = temp_arr;
+		lib->capacity = new_capacity;
+	}
+}
+
+void addBook(Library* lib) {
+	saveHistory(lib);
+	reserveMemory(lib); // проверяем нужно ли довыделить память. если если то она добавится без выделения памяти. иначе выделится доп память
+
+	printf("\nдобавлена книга под номером %d\n", lib->count + 1);
+	inputBook(&lib->books[lib->count]);
+
+	lib->count++;
+	printf("\nкнига успешно добавлена");
+}
+
+void deleteBook(Library* lib, const char* title) {
+	for (int i = 0; i < lib->count; ++i) {
+		if (strcmp(lib->books[i].title, title) == 0) {
+			freeBookContent(&lib->books[i]); // чистим данные книги но место под саму книгу как элемента картотеки оставляем 
+
+			for (int j = i; j < lib->count - 1; ++j) {
+				lib->books[j] = lib->books[j + 1];
+			}
+				
+			lib->count--;
+			printf("книга успешно удалена\n");
+			return;
+		}
+	}
+	printf("такой книги в картотеке нет\n");
+}
+
+void deleteBookAction(Library* lib) { // созданим доп. функцию чтоб все функции картотеки имели одинаковую сигнатуру для меню
+	saveHistory(lib);
+	char buffer[2048];
+	printf("введите название книги для удаления: ");
+
+	if (scanf(" %2047[^\n]", buffer) == 1) {
+		clearInputBuffer();
+		deleteBook(lib, buffer); // вызываем основную логику
+	}
+}
+
+void saveToFile(Library* lib, const char* filename) {
+	FILE* f = fopen(filename, "w"); // "w" - создает файл для записи
+	if (!f) {
+		return;
+	}
+
+	fprintf(f, "%d\n", lib->count); // в самом начале записываем кол-во элементов картотеки чтоб потом считать
+	for (int i = 0; i < lib->count; ++i) {
+		fprintf(f, "%s|%s|%d|%s|%s\n",
+			lib->books[i].author, lib->books[i].title, lib->books[i].year,
+			lib->books[i].genre, lib->books[i].summary);
+	}
+	fclose(f);
+}
+
+void loadFromFile(Library* lib, const char* filename) {
+	const char* dot = strrchr(filename, '.'); // ищем последнюю точку в имени файла. strrchr находит указатель на нужный символ
+	if (!dot || strcmp(dot, ".txt") != 0) {
+		printf("\nфайл %s имеет неверное расширение (ожидалось .txt)\n", filename);
+		return;
+	}
+	FILE* f = fopen(filename, "r"); // "r" - только чтение
+	if (!f) {
+		printf("\nфайл %s не найден\n", filename);
+		return;
+	}
+
+	if (lib->books != nullptr) {
+		for (int i = 0; i < lib->count; ++i) {
+			freeBookContent(&lib->books[i]); // чистим строчки для каждой книги 
+		}
+		delete[] lib->books;
+		lib->books = nullptr;
+	}
+
+	int new_count;
+	if (fscanf(f, "%d\n", &new_count) != 1) { // считываем число которое записывали в самом начале файла
+		fclose(f);
+		return;
+	}
+
+	lib->count = new_count; // теперь готовим массив нужного нам размера
+	lib->capacity = new_count;
+	lib->books = new Book[lib->capacity];
+
+	char buffer[2048] = { 0 }; // буфер для чтения строк
+
+	for (int i = 0; i < lib->count; ++i) { // считываем каждую книгу. считываем данные до разделителя |. при этом пробелы будут игнорироваться что позволит нам считывать строчки целиком
+
+		lib->books[i].author = nullptr;
+		lib->books[i].title = nullptr;
+		lib->books[i].genre = nullptr;
+		lib->books[i].summary = nullptr;
+		lib->books[i].year = 0;
+
+		if (fscanf(f, "%2047[^|]|", buffer) == 1) {
+			lib->books[i].author = new char[strlen(buffer) + 1];
+			strcpy(lib->books[i].author, buffer);
+		}
+
+		if (fscanf(f, "%2047[^|]|", buffer) == 1) {
+			lib->books[i].title = new char[strlen(buffer) + 1];
+			strcpy(lib->books[i].title, buffer);
+		}
+
+		if (fscanf(f, "%d|", &lib->books[i].year) != 1) {
+			lib->books[i].year = 0; 
+		}
+
+		if (fscanf(f, "%2047[^|]|", buffer) == 1) {
+			lib->books[i].genre = new char[strlen(buffer) + 1];
+			strcpy(lib->books[i].genre, buffer);
+		}
+		// читаем аннотацию до конца строки '\n'
+		if (fscanf(f, "%2047[^\n]\n", buffer) == 1) {
+			lib->books[i].summary = new char[strlen(buffer) + 1];
+			strcpy(lib->books[i].summary, buffer);
+		}
+	}
+
+	fclose(f);
+	printf("картотека успешно загружена (%d книг)\n", lib->count);
+}
+
+void saveToFileAction(Library* lib) {
+	char filename[256];
+	printf("введите имя файла для сохранения (например, lib.txt): ");
+	if (scanf(" %255s", filename) == 1) {
+		clearInputBuffer();
+		saveToFile(lib, filename);
+		printf("данные успешно сохранены в %s\n", filename);
+	}
+}
+
+void loadFromFileAction(Library* lib) {
+	saveHistory(lib);
+	char filename[256];
+	printf("введите имя файла для загрузки: ");
+	if (scanf(" %255s", filename) == 1) {
+		clearInputBuffer();
+		loadFromFile(lib, filename);
+	}
+}
+
+void exitProg(Library* lib) {
+	if (lib == nullptr) return;
+
+	for (int i = 0; i < lib->count; ++i) {
+		freeBookContent(&lib->books[i]);
+
+	}
+
+	if (lib->books != nullptr) {
+		delete[] lib->books;
+	}
+
+	delete lib;
+
+	printf("\nпамять очищена. до свидания!\n");
+}
+
+void showGenre(Library* lib) {
+	if (lib == nullptr || lib->count == 0) {
+		printf("библиотека пуста, жанров нет.\n");
+		return;
+	}
+
+	int max_count = 0;
+	const char* best_genre = "не определен";
+
+	for (int i = 0; i < lib->count; ++i) { // проходим по каждой книге
+		int current_count = 0;
+		const char* current_genre = lib->books[i].genre;
+
+		if (current_genre == nullptr) { continue; }
+
+		// считаем, сколько раз встречается этот жанр в библиотеке
+		for (int j = 0; j < lib->count; ++j) {
+			if (lib->books[j].genre != nullptr &&
+				strcmp(current_genre, lib->books[j].genre) == 0) {
+				current_count++;
+			}
+		}
+
+		// нашли жанр который встречается чаще => запоминаем его
+		if (current_count > max_count) {
+			max_count = current_count;
+			best_genre = current_genre;
+		}
+	}
+
+	printf("самый популярный жанр: %s (%d раз)\n", best_genre, max_count);
+}
+
+void findBookByName(Library* lib) {
+	printf("введите название книги: ");
+
+	char buffer[256] = { 0 }; // создаем буфер для ввода названия
+	int num = -1;
+
+	if (scanf(" %255[^\n]", buffer) != 1) { // как и раньше считываем строку до конца игнорируя пробелы
+		printf("неправильный ввод");
+		clearInputBuffer();
+		return;
+	} 
+	clearInputBuffer();
+
+	for (int i = 0; i < lib->count; ++i) {
+		if (lib->books[i].title != nullptr && strcmp(buffer, lib->books[i].title) == 0) { // сравниваем введенное название со всеми назвниями книг
+			num = i;
+			break;
+		}
+	}
+
+	if (num == -1) {
+		printf("такой книги в библиотеке нет.\n");
+		return;
+	}
+
+	printf("вот ваша книга.\n");
+	printBook(&lib->books[num]);
+}
+
+void saveHistory(Library* lib) {
+	if (history_count == MAX_UNDO) {
+		exitProg(history[0]); // чистим первое действие чтоб добавить новое
+		for (int i = 0; i < MAX_UNDO - 1; i++) { 
+			history[i] = history[i + 1]; 
+		}
+		history_count--;
+	}
+
+	Library* snap = new Library(); // создаем копию текущего состояния библиотеки
+	snap->count = lib->count;
+	snap->capacity = lib->count;
+	snap->books = new Book[snap->capacity];
+
+	for (int i = 0; i < lib->count; i++) {
+		snap->books[i].year = lib->books[i].year;
+		snap->books[i].author = my_strdup(lib->books[i].author); // копируем строки через самодельную функцию дублирования которая 
+		// копирует поведение strdup. саму strdup мы использовать не будем потому что в ней память выделяется по стандартам си что будет конфликтовать с new и delete
+		snap->books[i].title = my_strdup(lib->books[i].title);
+		snap->books[i].genre = my_strdup(lib->books[i].genre);
+		snap->books[i].summary = my_strdup(lib->books[i].summary);
+	}
+
+	history[history_count++] = snap;
+}
+
+void undo(Library* lib) {
+	if (history_count == 0) {
+		printf("\nистория пуста. отменять нечего.\n");
+		return;
+	}
+
+	int n;
+	printf("сколько действий отменить? (доступно %d): ", history_count);
+	if (scanf("%d", &n) != 1) {
+		clearInputBuffer();
+		return;
+	}
+	clearInputBuffer();
+
+	if (n > history_count) {
+		n = history_count;
+	}
+
+	if (n <= 0) {
+		return; 
+	}
+
+	int target_idx = history_count - n; // находим нужный нам индекс среди всех откатов
+	Library* target_snap = history[target_idx]; // запоминаем нужный откат
+
+	for (int i = 0; i < lib->count; i++) {
+		freeBookContent(&lib->books[i]);
+	}
+	delete[] lib->books;
+
+	lib->count = target_snap->count;
+	lib->capacity = target_snap->capacity;
+	lib->books = target_snap->books;
+
+	for (int i = target_idx; i < history_count; i++) {
+		if (i == target_idx) {
+			delete history[i]; // удаляем только структуру, массив книг передали в lib
+		} 
+		else {
+			exitProg(history[i]); // остальные чистим полностью
+		}
+		history[i] = nullptr;
+	}
+
+	history_count = target_idx;
+	printf("\nотменено %d действий.\n", n);
+}
+
+
+void printLibrary(Library* lib) {
+	if (lib == nullptr || lib->count == 0) {
+		printf("\nбиблиотека пуста или не инициализирована\n");
+		return;
+	}
+
+	printf("\nвот все наши книги\n\n");
+
+	for (int i = 0; i < lib->count; ++i) {
+		printf("----книга номер %d----\n", i+1);
+		printBook(&lib->books[i]); // выводим книги по одной
+	}
+}
+
+void changeBook(Library* lib) {
+	if (lib == nullptr || lib->count == 0) {
+		printf("картотека пуста.\n");
+		return;
+	}
+
+	char search_buffer[2048] = { 0 };
+	printf("введите название книги для изменения: "); // делаем то же самое что и в findBookByName
+	if (scanf(" %2047[^\n]", search_buffer) != 1) {
+		//  если ввод пуст или произошел сбой
+		printf("ошибка: не удалось прочитать название\n");
+		clearInputBuffer();
+		return; // выходим тк искать нечего
+	}
+	clearInputBuffer();
+
+	int index = -1;
+	for (int i = 0; i < lib->count; ++i) {
+		if (strcmp(lib->books[i].title, search_buffer) == 0) {
+			index = i;
+			break;
+		}
+	}
+
+	if (index == -1) {
+		printf("книга не найдена.\n");
+		return;
+	}
+
+	Book* b = &lib->books[index];
+
+	printf("давайте ее изменим!\n");
+	printf("(если хотите оставить поле неизменным ввведите \"-\")\n");
+
+	char buffer[2048] = { 0 }; // буфер для чтения строки
+
+	printf("автор: ");
+	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {// как и в одной из прошлых лаб используем [^\n] чтобы считать имя целиком а не до пробела{
+		delete[] b->author;
+		b->author = new char[strlen(buffer) + 1]; 
+		strcpy(b->author, buffer);
+	}
+	clearInputBuffer();
+
+	printf("название: ");
+	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {
+		delete[] b->title;
+		b->title = new char[strlen(buffer) + 1];
+		strcpy(b->title, buffer);
+	}
+	clearInputBuffer();
+
+	printf("год (введите 0, чтобы оставить %d): ", b->year);
+	int new_year;
+	if (scanf("%d", &new_year) == 1 && new_year != 0) {
+		if (new_year >= 868 && new_year <= 2026) {
+			b->year = new_year; 
+		}
+	}
+	clearInputBuffer();
+
+	printf("жанр: ");
+	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {
+		delete[] b->genre;
+		b->genre = new char[strlen(buffer) + 1];
+		strcpy(b->genre, buffer);
+	}
+	clearInputBuffer();
+
+	printf("краткое описание: ");
+	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {
+		delete[] b->summary;
+		b->summary = new char[strlen(buffer) + 1];
+		strcpy(b->summary, buffer);
+	}
+	clearInputBuffer();
+
+	printf("\nданные обновлены!\n");
+}
+
