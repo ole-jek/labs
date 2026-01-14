@@ -337,7 +337,7 @@ int main()
 
     int steps = 1000;
 
-    // линейная функция: y = x (интеграл от 0 до 4 = 16.0)
+    // линейная функция: y = x (интеграл от 0 до 1 = 0.5)
     printf("линейная (x) [0,1]: %lf (ожидалось: 0.5)\n",
         integrate(linear, 0, 1, steps));
 
@@ -566,21 +566,6 @@ int main()
     m_free(&fibo);
 
     return 0;
-}
-
-int CmpNum(const void* first, const void* second) {
-    const int* f_num = (const int*)first;
-    const int* s_num = (const int*)second;
-
-    if (*f_num < *s_num) { 
-        return -1; 
-    }
-    else if (*f_num > *s_num) { 
-        return 1; 
-    }
-    else { 
-        return 0; 
-    }
 }
 
 void safeBookFill(char* buf, const char* text, int max_size) {
