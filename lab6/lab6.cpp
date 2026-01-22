@@ -70,7 +70,7 @@ int main() {
         changeBook,
         saveToFileAction,
         loadFromFileAction,
-        exitProg,//sortLib,
+        sortLib,
         findBookByName,
         undo,
         showGenre

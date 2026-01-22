@@ -3,6 +3,10 @@
 
 #include "book.h"
 
+extern int sort_fields[3];
+extern int sort_dirs[3];
+extern int sort_num;
+
 typedef struct {
 	Book* books;
 	int count;
@@ -19,7 +23,7 @@ void saveToFileAction(Library* lib); // +
 void loadFromFile(Library* lib, const char* filename); // +
 void loadFromFileAction(Library* lib); // +
 void printLibrary(Library* lib); // +
-//void sortLib(Library* lib); // -
+void sortLib(Library* lib); // +
 void findBookByName(Library* lib); // + 
 void undo(Library* lib); // +
 void changeBook(Library* lib); // +

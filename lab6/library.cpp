@@ -1,11 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "library.h"
+#include "funcs.h"
 
 #define MAX_UNDO 10
 static Library* history[MAX_UNDO] = { nullptr };
 static int history_count = 0;
-
-
+int sort_fields[3];
+int sort_dirs[3];
+int sort_num = 0;
 
 Library* createLib() {
 	Library* lib = new Library();
@@ -64,7 +66,7 @@ void deleteBook(Library* lib, const char* title) {
 
 void deleteBookAction(Library* lib) { // созданим доп. функцию чтоб все функции картотеки имели одинаковую сигнатуру для меню
 	saveHistory(lib);
-	char buffer[2048];
+	char buffer[2048] = { 0 } ;
 	printf("введите название книги для удаления: ");
 
 	if (scanf(" %2047[^\n]", buffer) == 1) {
@@ -158,7 +160,7 @@ void loadFromFile(Library* lib, const char* filename) {
 }
 
 void saveToFileAction(Library* lib) {
-	char filename[256];
+	char filename[256] = { 0 };
 	printf("введите имя файла для сохранения (например, lib.txt): ");
 	if (scanf(" %255s", filename) == 1) {
 		clearInputBuffer();
@@ -169,7 +171,7 @@ void saveToFileAction(Library* lib) {
 
 void loadFromFileAction(Library* lib) {
 	saveHistory(lib);
-	char filename[256];
+	char filename[256] = { 0 };
 	printf("введите имя файла для загрузки: ");
 	if (scanf(" %255s", filename) == 1) {
 		clearInputBuffer();
@@ -345,6 +347,55 @@ void printLibrary(Library* lib) {
 	}
 }
 
+void sortLib(Library* lib) {
+	if (lib == nullptr || lib->count < 2) {
+		printf("\nэлементов для сортировки недостаточно\n");
+		return;
+	}
+
+	printf("введите количество полей для сортировки (1-3): ");
+	if (scanf("%d", &sort_num) != 1) sort_num = 1;
+	if (sort_num < 1) {
+		printf("введенное число меньше возможного. засчитаем его за 1 по умолчанию");
+		sort_num = 1;
+	}
+	if (sort_num > 3) {
+		printf("введенное число больше возможного. засчитаем его за 3 по умолчанию");
+		sort_num = 3;
+	}
+
+	for (int i = 0; i < sort_num; ++i) {
+		printf("\nКритерий №%d:\n", i + 1);
+		printf("Выберите поле (1-автор, 2-название, 3-год): ");
+		while (1) {
+			if (scanf("%d", &sort_fields[i]) != 1 || sort_fields[i] < 1 || sort_fields[i] > 3) {
+				printf("\nошибка. введите число от 1 до 3\n");
+				clearInputBuffer();
+				continue;
+			}
+			break;
+		}
+		printf("Направление (1-возрастание, -1-убывание): ");
+		while (1) {
+			if (scanf("%d", &sort_dirs[i]) != 1 ||  ( sort_dirs[i] != 1 && sort_dirs[i] != -1) ) {
+				printf("\nошибка. введите число 1 для возрастания или -1 для убывания\n");
+				clearInputBuffer();
+				continue;
+			}
+			break;
+		}
+		
+	}
+	clearInputBuffer();
+
+	saveHistory(lib); // сохраняем состояние для Undo
+
+	// вызываем sort
+	sort((char*)lib->books, lib->count, sizeof(Book), swap_book, cmp_books_multi);
+
+	printf("\nбиблиотека успешно отсортирована.");
+}
+
 void changeBook(Library* lib) {
 	if (lib == nullptr || lib->count == 0) {
 		printf("картотека пуста.\n");
@@ -355,7 +406,7 @@ void changeBook(Library* lib) {
 	printf("введите название книги для изменения: "); // делаем то же самое что и в findBookByName
 	if (scanf(" %2047[^\n]", search_buffer) != 1) {
 		//  если ввод пуст или произошел сбой
-		printf("ошибка: не удалось прочитать название\n");
+		printf("ошибка: не удалось прочитать название");
 		clearInputBuffer();
 		return; // выходим тк искать нечего
 	}
@@ -422,6 +473,6 @@ void changeBook(Library* lib) {
 	}
 	clearInputBuffer();
 
-	printf("\nданные обновлены!\n");
+	printf("\nданные обновлены!");
 }
 
