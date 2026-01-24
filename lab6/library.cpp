@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+п»ї#define _CRT_SECURE_NO_WARNINGS
 #include "library.h"
 #include "funcs.h"
 
@@ -25,7 +25,7 @@ void reserveMemory(Library* lib) {
 		int new_capacity = lib->capacity + lib->capacity / 2 + 1;
 		Book* temp_arr = new Book[new_capacity];
 
-		for (int i = 0; i < lib->count; ++i) { // переносим данные во временное "хранилище"
+		for (int i = 0; i < lib->count; ++i) { // РїРµСЂРµРЅРѕСЃРёРј РґР°РЅРЅС‹Рµ РІРѕ РІСЂРµРјРµРЅРЅРѕРµ "С…СЂР°РЅРёР»РёС‰Рµ"
 			temp_arr[i] = lib->books[i];
 		}
 
@@ -38,50 +38,50 @@ void reserveMemory(Library* lib) {
 
 void addBook(Library* lib) {
 	saveHistory(lib);
-	reserveMemory(lib); // проверяем нужно ли довыделить память. если если то она добавится без выделения памяти. иначе выделится доп память
+	reserveMemory(lib); // РїСЂРѕРІРµСЂСЏРµРј РЅСѓР¶РЅРѕ Р»Рё РґРѕРІС‹РґРµР»РёС‚СЊ РїР°РјСЏС‚СЊ. РµСЃР»Рё РµСЃР»Рё С‚Рѕ РѕРЅР° РґРѕР±Р°РІРёС‚СЃСЏ Р±РµР· РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё. РёРЅР°С‡Рµ РІС‹РґРµР»РёС‚СЃСЏ РґРѕРї РїР°РјСЏС‚СЊ
 
-	printf("\nдобавлена книга под номером %d\n", lib->count + 1);
+	printf("\nРґРѕР±Р°РІР»РµРЅР° РєРЅРёРіР° РїРѕРґ РЅРѕРјРµСЂРѕРј %d\n", lib->count + 1);
 	inputBook(&lib->books[lib->count]);
 
 	lib->count++;
-	printf("\nкнига успешно добавлена");
+	printf("\nРєРЅРёРіР° СѓСЃРїРµС€РЅРѕ РґРѕР±Р°РІР»РµРЅР°");
 }
 
 void deleteBook(Library* lib, const char* title) {
 	for (int i = 0; i < lib->count; ++i) {
 		if (strcmp(lib->books[i].title, title) == 0) {
-			freeBookContent(&lib->books[i]); // чистим данные книги но место под саму книгу как элемента картотеки оставляем 
+			freeBookContent(&lib->books[i]); // С‡РёСЃС‚РёРј РґР°РЅРЅС‹Рµ РєРЅРёРіРё РЅРѕ РјРµСЃС‚Рѕ РїРѕРґ СЃР°РјСѓ РєРЅРёРіСѓ РєР°Рє СЌР»РµРјРµРЅС‚Р° РєР°СЂС‚РѕС‚РµРєРё РѕСЃС‚Р°РІР»СЏРµРј 
 
 			for (int j = i; j < lib->count - 1; ++j) {
 				lib->books[j] = lib->books[j + 1];
 			}
 				
 			lib->count--;
-			printf("книга успешно удалена\n");
+			printf("РєРЅРёРіР° СѓСЃРїРµС€РЅРѕ СѓРґР°Р»РµРЅР°\n");
 			return;
 		}
 	}
-	printf("такой книги в картотеке нет\n");
+	printf("С‚Р°РєРѕР№ РєРЅРёРіРё РІ РєР°СЂС‚РѕС‚РµРєРµ РЅРµС‚\n");
 }
 
-void deleteBookAction(Library* lib) { // созданим доп. функцию чтоб все функции картотеки имели одинаковую сигнатуру для меню
+void deleteBookAction(Library* lib) { // СЃРѕР·РґР°РЅРёРј РґРѕРї. С„СѓРЅРєС†РёСЋ С‡С‚РѕР± РІСЃРµ С„СѓРЅРєС†РёРё РєР°СЂС‚РѕС‚РµРєРё РёРјРµР»Рё РѕРґРёРЅР°РєРѕРІСѓСЋ СЃРёРіРЅР°С‚СѓСЂСѓ РґР»СЏ РјРµРЅСЋ
 	saveHistory(lib);
 	char buffer[2048] = { 0 } ;
-	printf("введите название книги для удаления: ");
+	printf("РІРІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РєРЅРёРіРё РґР»СЏ СѓРґР°Р»РµРЅРёСЏ: ");
 
 	if (scanf(" %2047[^\n]", buffer) == 1) {
 		clearInputBuffer();
-		deleteBook(lib, buffer); // вызываем основную логику
+		deleteBook(lib, buffer); // РІС‹Р·С‹РІР°РµРј РѕСЃРЅРѕРІРЅСѓСЋ Р»РѕРіРёРєСѓ
 	}
 }
 
 void saveToFile(Library* lib, const char* filename) {
-	FILE* f = fopen(filename, "w"); // "w" - создает файл для записи
+	FILE* f = fopen(filename, "w"); // "w" - СЃРѕР·РґР°РµС‚ С„Р°Р№Р» РґР»СЏ Р·Р°РїРёСЃРё
 	if (!f) {
 		return;
 	}
 
-	fprintf(f, "%d\n", lib->count); // в самом начале записываем кол-во элементов картотеки чтоб потом считать
+	fprintf(f, "%d\n", lib->count); // РІ СЃР°РјРѕРј РЅР°С‡Р°Р»Рµ Р·Р°РїРёСЃС‹РІР°РµРј РєРѕР»-РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РєР°СЂС‚РѕС‚РµРєРё С‡С‚РѕР± РїРѕС‚РѕРј СЃС‡РёС‚Р°С‚СЊ
 	for (int i = 0; i < lib->count; ++i) {
 		fprintf(f, "%s|%s|%d|%s|%s\n",
 			lib->books[i].author, lib->books[i].title, lib->books[i].year,
@@ -91,38 +91,38 @@ void saveToFile(Library* lib, const char* filename) {
 }
 
 void loadFromFile(Library* lib, const char* filename) {
-	const char* dot = strrchr(filename, '.'); // ищем последнюю точку в имени файла. strrchr находит указатель на нужный символ
+	const char* dot = strrchr(filename, '.'); // РёС‰РµРј РїРѕСЃР»РµРґРЅСЋСЋ С‚РѕС‡РєСѓ РІ РёРјРµРЅРё С„Р°Р№Р»Р°. strrchr РЅР°С…РѕРґРёС‚ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅСѓР¶РЅС‹Р№ СЃРёРјРІРѕР»
 	if (!dot || strcmp(dot, ".txt") != 0) {
-		printf("\nфайл %s имеет неверное расширение (ожидалось .txt)\n", filename);
+		printf("\nС„Р°Р№Р» %s РёРјРµРµС‚ РЅРµРІРµСЂРЅРѕРµ СЂР°СЃС€РёСЂРµРЅРёРµ (РѕР¶РёРґР°Р»РѕСЃСЊ .txt)\n", filename);
 		return;
 	}
-	FILE* f = fopen(filename, "r"); // "r" - только чтение
+	FILE* f = fopen(filename, "r"); // "r" - С‚РѕР»СЊРєРѕ С‡С‚РµРЅРёРµ
 	if (!f) {
-		printf("\nфайл %s не найден\n", filename);
+		printf("\nС„Р°Р№Р» %s РЅРµ РЅР°Р№РґРµРЅ\n", filename);
 		return;
 	}
 
 	if (lib->books != nullptr) {
 		for (int i = 0; i < lib->count; ++i) {
-			freeBookContent(&lib->books[i]); // чистим строчки для каждой книги 
+			freeBookContent(&lib->books[i]); // С‡РёСЃС‚РёРј СЃС‚СЂРѕС‡РєРё РґР»СЏ РєР°Р¶РґРѕР№ РєРЅРёРіРё 
 		}
 		delete[] lib->books;
 		lib->books = nullptr;
 	}
 
 	int new_count;
-	if (fscanf(f, "%d\n", &new_count) != 1) { // считываем число которое записывали в самом начале файла
+	if (fscanf(f, "%d\n", &new_count) != 1) { // СЃС‡РёС‚С‹РІР°РµРј С‡РёСЃР»Рѕ РєРѕС‚РѕСЂРѕРµ Р·Р°РїРёСЃС‹РІР°Р»Рё РІ СЃР°РјРѕРј РЅР°С‡Р°Р»Рµ С„Р°Р№Р»Р°
 		fclose(f);
 		return;
 	}
 
-	lib->count = new_count; // теперь готовим массив нужного нам размера
+	lib->count = new_count; // С‚РµРїРµСЂСЊ РіРѕС‚РѕРІРёРј РјР°СЃСЃРёРІ РЅСѓР¶РЅРѕРіРѕ РЅР°Рј СЂР°Р·РјРµСЂР°
 	lib->capacity = new_count;
 	lib->books = new Book[lib->capacity];
 
-	char buffer[2048] = { 0 }; // буфер для чтения строк
+	char buffer[2048] = { 0 }; // Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ СЃС‚СЂРѕРє
 
-	for (int i = 0; i < lib->count; ++i) { // считываем каждую книгу. считываем данные до разделителя |. при этом пробелы будут игнорироваться что позволит нам считывать строчки целиком
+	for (int i = 0; i < lib->count; ++i) { // СЃС‡РёС‚С‹РІР°РµРј РєР°Р¶РґСѓСЋ РєРЅРёРіСѓ. СЃС‡РёС‚С‹РІР°РµРј РґР°РЅРЅС‹Рµ РґРѕ СЂР°Р·РґРµР»РёС‚РµР»СЏ |. РїСЂРё СЌС‚РѕРј РїСЂРѕР±РµР»С‹ Р±СѓРґСѓС‚ РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊСЃСЏ С‡С‚Рѕ РїРѕР·РІРѕР»РёС‚ РЅР°Рј СЃС‡РёС‚С‹РІР°С‚СЊ СЃС‚СЂРѕС‡РєРё С†РµР»РёРєРѕРј
 
 		lib->books[i].author = nullptr;
 		lib->books[i].title = nullptr;
@@ -148,7 +148,7 @@ void loadFromFile(Library* lib, const char* filename) {
 			lib->books[i].genre = new char[strlen(buffer) + 1];
 			strcpy(lib->books[i].genre, buffer);
 		}
-		// читаем аннотацию до конца строки '\n'
+		// С‡РёС‚Р°РµРј Р°РЅРЅРѕС‚Р°С†РёСЋ РґРѕ РєРѕРЅС†Р° СЃС‚СЂРѕРєРё '\n'
 		if (fscanf(f, "%2047[^\n]\n", buffer) == 1) {
 			lib->books[i].summary = new char[strlen(buffer) + 1];
 			strcpy(lib->books[i].summary, buffer);
@@ -156,23 +156,23 @@ void loadFromFile(Library* lib, const char* filename) {
 	}
 
 	fclose(f);
-	printf("картотека успешно загружена (%d книг)\n", lib->count);
+	printf("РєР°СЂС‚РѕС‚РµРєР° СѓСЃРїРµС€РЅРѕ Р·Р°РіСЂСѓР¶РµРЅР° (%d РєРЅРёРі)\n", lib->count);
 }
 
 void saveToFileAction(Library* lib) {
 	char filename[256] = { 0 };
-	printf("введите имя файла для сохранения (например, lib.txt): ");
+	printf("РІРІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ (РЅР°РїСЂРёРјРµСЂ, lib.txt): ");
 	if (scanf(" %255s", filename) == 1) {
 		clearInputBuffer();
 		saveToFile(lib, filename);
-		printf("данные успешно сохранены в %s\n", filename);
+		printf("РґР°РЅРЅС‹Рµ СѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРµРЅС‹ РІ %s\n", filename);
 	}
 }
 
 void loadFromFileAction(Library* lib) {
 	saveHistory(lib);
 	char filename[256] = { 0 };
-	printf("введите имя файла для загрузки: ");
+	printf("РІРІРµРґРёС‚Рµ РёРјСЏ С„Р°Р№Р»Р° РґР»СЏ Р·Р°РіСЂСѓР·РєРё: ");
 	if (scanf(" %255s", filename) == 1) {
 		clearInputBuffer();
 		loadFromFile(lib, filename);
@@ -193,25 +193,25 @@ void exitProg(Library* lib) {
 
 	delete lib;
 
-	printf("\nпамять очищена. до свидания!\n");
+	printf("\nРїР°РјСЏС‚СЊ РѕС‡РёС‰РµРЅР°. РґРѕ СЃРІРёРґР°РЅРёСЏ!\n");
 }
 
 void showGenre(Library* lib) {
 	if (lib == nullptr || lib->count == 0) {
-		printf("библиотека пуста, жанров нет.\n");
+		printf("Р±РёР±Р»РёРѕС‚РµРєР° РїСѓСЃС‚Р°, Р¶Р°РЅСЂРѕРІ РЅРµС‚.\n");
 		return;
 	}
 
 	int max_count = 0;
-	const char* best_genre = "не определен";
+	const char* best_genre = "РЅРµ РѕРїСЂРµРґРµР»РµРЅ";
 
-	for (int i = 0; i < lib->count; ++i) { // проходим по каждой книге
+	for (int i = 0; i < lib->count; ++i) { // РїСЂРѕС…РѕРґРёРј РїРѕ РєР°Р¶РґРѕР№ РєРЅРёРіРµ
 		int current_count = 0;
 		const char* current_genre = lib->books[i].genre;
 
 		if (current_genre == nullptr) { continue; }
 
-		// считаем, сколько раз встречается этот жанр в библиотеке
+		// СЃС‡РёС‚Р°РµРј, СЃРєРѕР»СЊРєРѕ СЂР°Р· РІСЃС‚СЂРµС‡Р°РµС‚СЃСЏ СЌС‚РѕС‚ Р¶Р°РЅСЂ РІ Р±РёР±Р»РёРѕС‚РµРєРµ
 		for (int j = 0; j < lib->count; ++j) {
 			if (lib->books[j].genre != nullptr &&
 				strcmp(current_genre, lib->books[j].genre) == 0) {
@@ -219,63 +219,63 @@ void showGenre(Library* lib) {
 			}
 		}
 
-		// нашли жанр который встречается чаще => запоминаем его
+		// РЅР°С€Р»Рё Р¶Р°РЅСЂ РєРѕС‚РѕСЂС‹Р№ РІСЃС‚СЂРµС‡Р°РµС‚СЃСЏ С‡Р°С‰Рµ => Р·Р°РїРѕРјРёРЅР°РµРј РµРіРѕ
 		if (current_count > max_count) {
 			max_count = current_count;
 			best_genre = current_genre;
 		}
 	}
 
-	printf("самый популярный жанр: %s (%d раз)\n", best_genre, max_count);
+	printf("СЃР°РјС‹Р№ РїРѕРїСѓР»СЏСЂРЅС‹Р№ Р¶Р°РЅСЂ: %s (%d СЂР°Р·)\n", best_genre, max_count);
 }
 
 void findBookByName(Library* lib) {
-	printf("введите название книги: ");
+	printf("РІРІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РєРЅРёРіРё: ");
 
-	char buffer[256] = { 0 }; // создаем буфер для ввода названия
+	char buffer[256] = { 0 }; // СЃРѕР·РґР°РµРј Р±СѓС„РµСЂ РґР»СЏ РІРІРѕРґР° РЅР°Р·РІР°РЅРёСЏ
 	int num = -1;
 
-	if (scanf(" %255[^\n]", buffer) != 1) { // как и раньше считываем строку до конца игнорируя пробелы
-		printf("неправильный ввод");
+	if (scanf(" %255[^\n]", buffer) != 1) { // РєР°Рє Рё СЂР°РЅСЊС€Рµ СЃС‡РёС‚С‹РІР°РµРј СЃС‚СЂРѕРєСѓ РґРѕ РєРѕРЅС†Р° РёРіРЅРѕСЂРёСЂСѓСЏ РїСЂРѕР±РµР»С‹
+		printf("РЅРµРїСЂР°РІРёР»СЊРЅС‹Р№ РІРІРѕРґ");
 		clearInputBuffer();
 		return;
 	} 
 	clearInputBuffer();
 
 	for (int i = 0; i < lib->count; ++i) {
-		if (lib->books[i].title != nullptr && strcmp(buffer, lib->books[i].title) == 0) { // сравниваем введенное название со всеми назвниями книг
+		if (lib->books[i].title != nullptr && strcmp(buffer, lib->books[i].title) == 0) { // СЃСЂР°РІРЅРёРІР°РµРј РІРІРµРґРµРЅРЅРѕРµ РЅР°Р·РІР°РЅРёРµ СЃРѕ РІСЃРµРјРё РЅР°Р·РІРЅРёСЏРјРё РєРЅРёРі
 			num = i;
 			break;
 		}
 	}
 
 	if (num == -1) {
-		printf("такой книги в библиотеке нет.\n");
+		printf("С‚Р°РєРѕР№ РєРЅРёРіРё РІ Р±РёР±Р»РёРѕС‚РµРєРµ РЅРµС‚.\n");
 		return;
 	}
 
-	printf("вот ваша книга.\n");
+	printf("РІРѕС‚ РІР°С€Р° РєРЅРёРіР°.\n");
 	printBook(&lib->books[num]);
 }
 
 void saveHistory(Library* lib) {
 	if (history_count == MAX_UNDO) {
-		exitProg(history[0]); // чистим первое действие чтоб добавить новое
+		exitProg(history[0]); // С‡РёСЃС‚РёРј РїРµСЂРІРѕРµ РґРµР№СЃС‚РІРёРµ С‡С‚РѕР± РґРѕР±Р°РІРёС‚СЊ РЅРѕРІРѕРµ
 		for (int i = 0; i < MAX_UNDO - 1; i++) { 
 			history[i] = history[i + 1]; 
 		}
 		history_count--;
 	}
 
-	Library* snap = new Library(); // создаем копию текущего состояния библиотеки
+	Library* snap = new Library(); // СЃРѕР·РґР°РµРј РєРѕРїРёСЋ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 	snap->count = lib->count;
 	snap->capacity = lib->count;
 	snap->books = new Book[snap->capacity];
 
 	for (int i = 0; i < lib->count; i++) {
 		snap->books[i].year = lib->books[i].year;
-		snap->books[i].author = my_strdup(lib->books[i].author); // копируем строки через самодельную функцию дублирования которая 
-		// копирует поведение strdup. саму strdup мы использовать не будем потому что в ней память выделяется по стандартам си что будет конфликтовать с new и delete
+		snap->books[i].author = my_strdup(lib->books[i].author); // РєРѕРїРёСЂСѓРµРј СЃС‚СЂРѕРєРё С‡РµСЂРµР· СЃР°РјРѕРґРµР»СЊРЅСѓСЋ С„СѓРЅРєС†РёСЋ РґСѓР±Р»РёСЂРѕРІР°РЅРёСЏ РєРѕС‚РѕСЂР°СЏ 
+		// РєРѕРїРёСЂСѓРµС‚ РїРѕРІРµРґРµРЅРёРµ strdup. СЃР°РјСѓ strdup РјС‹ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РЅРµ Р±СѓРґРµРј РїРѕС‚РѕРјСѓ С‡С‚Рѕ РІ РЅРµР№ РїР°РјСЏС‚СЊ РІС‹РґРµР»СЏРµС‚СЃСЏ РїРѕ СЃС‚Р°РЅРґР°СЂС‚Р°Рј СЃРё С‡С‚Рѕ Р±СѓРґРµС‚ РєРѕРЅС„Р»РёРєС‚РѕРІР°С‚СЊ СЃ new Рё delete
 		snap->books[i].title = my_strdup(lib->books[i].title);
 		snap->books[i].genre = my_strdup(lib->books[i].genre);
 		snap->books[i].summary = my_strdup(lib->books[i].summary);
@@ -286,12 +286,12 @@ void saveHistory(Library* lib) {
 
 void undo(Library* lib) {
 	if (history_count == 0) {
-		printf("\nистория пуста. отменять нечего.\n");
+		printf("\nРёСЃС‚РѕСЂРёСЏ РїСѓСЃС‚Р°. РѕС‚РјРµРЅСЏС‚СЊ РЅРµС‡РµРіРѕ.\n");
 		return;
 	}
 
 	int n;
-	printf("сколько действий отменить? (доступно %d): ", history_count);
+	printf("СЃРєРѕР»СЊРєРѕ РґРµР№СЃС‚РІРёР№ РѕС‚РјРµРЅРёС‚СЊ? (РґРѕСЃС‚СѓРїРЅРѕ %d): ", history_count);
 	if (scanf("%d", &n) != 1) {
 		clearInputBuffer();
 		return;
@@ -306,8 +306,8 @@ void undo(Library* lib) {
 		return; 
 	}
 
-	int target_idx = history_count - n; // находим нужный нам индекс среди всех откатов
-	Library* target_snap = history[target_idx]; // запоминаем нужный откат
+	int target_idx = history_count - n; // РЅР°С…РѕРґРёРј РЅСѓР¶РЅС‹Р№ РЅР°Рј РёРЅРґРµРєСЃ СЃСЂРµРґРё РІСЃРµС… РѕС‚РєР°С‚РѕРІ
+	Library* target_snap = history[target_idx]; // Р·Р°РїРѕРјРёРЅР°РµРј РЅСѓР¶РЅС‹Р№ РѕС‚РєР°С‚
 
 	for (int i = 0; i < lib->count; i++) {
 		freeBookContent(&lib->books[i]);
@@ -320,65 +320,65 @@ void undo(Library* lib) {
 
 	for (int i = target_idx; i < history_count; i++) {
 		if (i == target_idx) {
-			delete history[i]; // удаляем только структуру, массив книг передали в lib
+			delete history[i]; // СѓРґР°Р»СЏРµРј С‚РѕР»СЊРєРѕ СЃС‚СЂСѓРєС‚СѓСЂСѓ, РјР°СЃСЃРёРІ РєРЅРёРі РїРµСЂРµРґР°Р»Рё РІ lib
 		} 
 		else {
-			exitProg(history[i]); // остальные чистим полностью
+			exitProg(history[i]); // РѕСЃС‚Р°Р»СЊРЅС‹Рµ С‡РёСЃС‚РёРј РїРѕР»РЅРѕСЃС‚СЊСЋ
 		}
 		history[i] = nullptr;
 	}
 
 	history_count = target_idx;
-	printf("\nотменено %d действий.\n", n);
+	printf("\nРѕС‚РјРµРЅРµРЅРѕ %d РґРµР№СЃС‚РІРёР№.\n", n);
 }
 
 
 void printLibrary(Library* lib) {
 	if (lib == nullptr || lib->count == 0) {
-		printf("\nбиблиотека пуста или не инициализирована\n");
+		printf("\nР±РёР±Р»РёРѕС‚РµРєР° РїСѓСЃС‚Р° РёР»Рё РЅРµ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅР°\n");
 		return;
 	}
 
-	printf("\nвот все наши книги\n\n");
+	printf("\nРІРѕС‚ РІСЃРµ РЅР°С€Рё РєРЅРёРіРё\n\n");
 
 	for (int i = 0; i < lib->count; ++i) {
-		printf("----книга номер %d----\n", i+1);
-		printBook(&lib->books[i]); // выводим книги по одной
+		printf("----РєРЅРёРіР° РЅРѕРјРµСЂ %d----\n", i+1);
+		printBook(&lib->books[i]); // РІС‹РІРѕРґРёРј РєРЅРёРіРё РїРѕ РѕРґРЅРѕР№
 	}
 }
 
 void sortLib(Library* lib) {
 	if (lib == nullptr || lib->count < 2) {
-		printf("\nэлементов для сортировки недостаточно\n");
+		printf("\nСЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ\n");
 		return;
 	}
 
-	printf("введите количество полей для сортировки (1-3): ");
+	printf("РІРІРµРґРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»РµР№ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё (1-3): ");
 	if (scanf("%d", &sort_num) != 1) sort_num = 1;
 	if (sort_num < 1) {
-		printf("введенное число меньше возможного. засчитаем его за 1 по умолчанию");
+		printf("РІРІРµРґРµРЅРЅРѕРµ С‡РёСЃР»Рѕ РјРµРЅСЊС€Рµ РІРѕР·РјРѕР¶РЅРѕРіРѕ. Р·Р°СЃС‡РёС‚Р°РµРј РµРіРѕ Р·Р° 1 РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 		sort_num = 1;
 	}
 	if (sort_num > 3) {
-		printf("введенное число больше возможного. засчитаем его за 3 по умолчанию");
+		printf("РІРІРµРґРµРЅРЅРѕРµ С‡РёСЃР»Рѕ Р±РѕР»СЊС€Рµ РІРѕР·РјРѕР¶РЅРѕРіРѕ. Р·Р°СЃС‡РёС‚Р°РµРј РµРіРѕ Р·Р° 3 РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 		sort_num = 3;
 	}
 
 	for (int i = 0; i < sort_num; ++i) {
-		printf("\nКритерий №%d:\n", i + 1);
-		printf("Выберите поле (1-автор, 2-название, 3-год): ");
+		printf("\nРљСЂРёС‚РµСЂРёР№ в„–%d:\n", i + 1);
+		printf("Р’С‹Р±РµСЂРёС‚Рµ РїРѕР»Рµ (1-Р°РІС‚РѕСЂ, 2-РЅР°Р·РІР°РЅРёРµ, 3-РіРѕРґ): ");
 		while (1) {
 			if (scanf("%d", &sort_fields[i]) != 1 || sort_fields[i] < 1 || sort_fields[i] > 3) {
-				printf("\nошибка. введите число от 1 до 3\n");
+				printf("\nРѕС€РёР±РєР°. РІРІРµРґРёС‚Рµ С‡РёСЃР»Рѕ РѕС‚ 1 РґРѕ 3\n");
 				clearInputBuffer();
 				continue;
 			}
 			break;
 		}
-		printf("Направление (1-возрастание, -1-убывание): ");
+		printf("РќР°РїСЂР°РІР»РµРЅРёРµ (1-РІРѕР·СЂР°СЃС‚Р°РЅРёРµ, -1-СѓР±С‹РІР°РЅРёРµ): ");
 		while (1) {
 			if (scanf("%d", &sort_dirs[i]) != 1 ||  ( sort_dirs[i] != 1 && sort_dirs[i] != -1) ) {
-				printf("\nошибка. введите число 1 для возрастания или -1 для убывания\n");
+				printf("\nРѕС€РёР±РєР°. РІРІРµРґРёС‚Рµ С‡РёСЃР»Рѕ 1 РґР»СЏ РІРѕР·СЂР°СЃС‚Р°РЅРёСЏ РёР»Рё -1 РґР»СЏ СѓР±С‹РІР°РЅРёСЏ\n");
 				clearInputBuffer();
 				continue;
 			}
@@ -388,27 +388,27 @@ void sortLib(Library* lib) {
 	}
 	clearInputBuffer();
 
-	saveHistory(lib); // сохраняем состояние для Undo
+	saveHistory(lib); // СЃРѕС…СЂР°РЅСЏРµРј СЃРѕСЃС‚РѕСЏРЅРёРµ РґР»СЏ Undo
 
-	// вызываем sort
+	// РІС‹Р·С‹РІР°РµРј sort
 	sort((char*)lib->books, lib->count, sizeof(Book), swap_book, cmp_books_multi);
 
-	printf("\nбиблиотека успешно отсортирована.");
+	printf("\nР±РёР±Р»РёРѕС‚РµРєР° СѓСЃРїРµС€РЅРѕ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅР°.");
 }
 
 void changeBook(Library* lib) {
 	if (lib == nullptr || lib->count == 0) {
-		printf("картотека пуста.\n");
+		printf("РєР°СЂС‚РѕС‚РµРєР° РїСѓСЃС‚Р°.\n");
 		return;
 	}
 
 	char search_buffer[2048] = { 0 };
-	printf("введите название книги для изменения: "); // делаем то же самое что и в findBookByName
+	printf("РІРІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РєРЅРёРіРё РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ: "); // РґРµР»Р°РµРј С‚Рѕ Р¶Рµ СЃР°РјРѕРµ С‡С‚Рѕ Рё РІ findBookByName
 	if (scanf(" %2047[^\n]", search_buffer) != 1) {
-		//  если ввод пуст или произошел сбой
-		printf("ошибка: не удалось прочитать название");
+		//  РµСЃР»Рё РІРІРѕРґ РїСѓСЃС‚ РёР»Рё РїСЂРѕРёР·РѕС€РµР» СЃР±РѕР№
+		printf("РѕС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕС‡РёС‚Р°С‚СЊ РЅР°Р·РІР°РЅРёРµ");
 		clearInputBuffer();
-		return; // выходим тк искать нечего
+		return; // РІС‹С…РѕРґРёРј С‚Рє РёСЃРєР°С‚СЊ РЅРµС‡РµРіРѕ
 	}
 	clearInputBuffer();
 
@@ -421,26 +421,26 @@ void changeBook(Library* lib) {
 	}
 
 	if (index == -1) {
-		printf("книга не найдена.\n");
+		printf("РєРЅРёРіР° РЅРµ РЅР°Р№РґРµРЅР°.\n");
 		return;
 	}
 
 	Book* b = &lib->books[index];
 
-	printf("давайте ее изменим!\n");
-	printf("(если хотите оставить поле неизменным ввведите \"-\")\n");
+	printf("РґР°РІР°Р№С‚Рµ РµРµ РёР·РјРµРЅРёРј!\n");
+	printf("(РµСЃР»Рё С…РѕС‚РёС‚Рµ РѕСЃС‚Р°РІРёС‚СЊ РїРѕР»Рµ РЅРµРёР·РјРµРЅРЅС‹Рј РІРІРІРµРґРёС‚Рµ \"-\")\n");
 
-	char buffer[2048] = { 0 }; // буфер для чтения строки
+	char buffer[2048] = { 0 }; // Р±СѓС„РµСЂ РґР»СЏ С‡С‚РµРЅРёСЏ СЃС‚СЂРѕРєРё
 
-	printf("автор: ");
-	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {// как и в одной из прошлых лаб используем [^\n] чтобы считать имя целиком а не до пробела{
+	printf("Р°РІС‚РѕСЂ: ");
+	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {// РєР°Рє Рё РІ РѕРґРЅРѕР№ РёР· РїСЂРѕС€Р»С‹С… Р»Р°Р± РёСЃРїРѕР»СЊР·СѓРµРј [^\n] С‡С‚РѕР±С‹ СЃС‡РёС‚Р°С‚СЊ РёРјСЏ С†РµР»РёРєРѕРј Р° РЅРµ РґРѕ РїСЂРѕР±РµР»Р°{
 		delete[] b->author;
 		b->author = new char[strlen(buffer) + 1]; 
 		strcpy(b->author, buffer);
 	}
 	clearInputBuffer();
 
-	printf("название: ");
+	printf("РЅР°Р·РІР°РЅРёРµ: ");
 	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {
 		delete[] b->title;
 		b->title = new char[strlen(buffer) + 1];
@@ -448,7 +448,7 @@ void changeBook(Library* lib) {
 	}
 	clearInputBuffer();
 
-	printf("год (введите 0, чтобы оставить %d): ", b->year);
+	printf("РіРѕРґ (РІРІРµРґРёС‚Рµ 0, С‡С‚РѕР±С‹ РѕСЃС‚Р°РІРёС‚СЊ %d): ", b->year);
 	int new_year;
 	if (scanf("%d", &new_year) == 1 && new_year != 0) {
 		if (new_year >= 868 && new_year <= 2026) {
@@ -457,7 +457,7 @@ void changeBook(Library* lib) {
 	}
 	clearInputBuffer();
 
-	printf("жанр: ");
+	printf("Р¶Р°РЅСЂ: ");
 	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {
 		delete[] b->genre;
 		b->genre = new char[strlen(buffer) + 1];
@@ -465,7 +465,7 @@ void changeBook(Library* lib) {
 	}
 	clearInputBuffer();
 
-	printf("краткое описание: ");
+	printf("РєСЂР°С‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ: ");
 	if (scanf(" %2047[^\n]", buffer) == 1 && strcmp(buffer, "-") != 0) {
 		delete[] b->summary;
 		b->summary = new char[strlen(buffer) + 1];
@@ -473,6 +473,6 @@ void changeBook(Library* lib) {
 	}
 	clearInputBuffer();
 
-	printf("\nданные обновлены!");
+	printf("\nРґР°РЅРЅС‹Рµ РѕР±РЅРѕРІР»РµРЅС‹!");
 }
 

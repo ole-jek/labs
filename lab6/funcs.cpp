@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+п»ї#define _CRT_SECURE_NO_WARNINGS
 #include "funcs.h"
 #include "book.h"
 #include "library.h"
@@ -47,10 +47,10 @@ int cmp_books_multi(const void* p1, const void* p2) {
         }
 
         if (res != 0) {
-            return res * sort_dirs[i]; // возвращаем результат, если нашли различие
+            return res * sort_dirs[i]; // РІРѕР·РІСЂР°С‰Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚, РµСЃР»Рё РЅР°С€Р»Рё СЂР°Р·Р»РёС‡РёРµ
         }
     }
-    return 0; // книги идентичны по всем выбранным полям
+    return 0; // РєРЅРёРіРё РёРґРµРЅС‚РёС‡РЅС‹ РїРѕ РІСЃРµРј РІС‹Р±СЂР°РЅРЅС‹Рј РїРѕР»СЏРј
 }
 
 void swap_book(void* p1, void* p2) {
