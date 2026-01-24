@@ -671,10 +671,9 @@ void var_args(int first, ...) {
     int count = 0;
     int current = first;
 
-    // В 2026 году рекомендуется проверять входные данные
     if (current != 0) {
         cout << "аргумент " << count++ << ": " << current << endl;
-        // Извлекаем аргументы, пока не встретим 0, добавленный макросом
+        // выводим элементы пока не встретим 0 добавленный макросом
         while ((current = va_arg(args, int)) != 0) {
             cout << "аргумент " << count++ << ": " << current << endl;
         }
