@@ -1,14 +1,14 @@
-#ifndef BOOK_H // защита от повторного включения
+п»ї#ifndef BOOK_H // Р·Р°С‰РёС‚Р° РѕС‚ РїРѕРІС‚РѕСЂРЅРѕРіРѕ РІРєР»СЋС‡РµРЅРёСЏ
 #define BOOK_H
 
-const int MAX_LENGTH = 40; // 40 для наглядности позже в работе
+const int MAX_LENGTH = 40; // 40 РґР»СЏ РЅР°РіР»СЏРґРЅРѕСЃС‚Рё РїРѕР·Р¶Рµ РІ СЂР°Р±РѕС‚Рµ
 
 typedef struct {
-    char author[MAX_LENGTH];      // автор 
-    char title[MAX_LENGTH];       // название 
-    int year;          // год 
-    double price;      // цена 
-    char category[MAX_LENGTH];    // категория
+    char author[MAX_LENGTH];      // Р°РІС‚РѕСЂ 
+    char title[MAX_LENGTH];       // РЅР°Р·РІР°РЅРёРµ 
+    int year;          // РіРѕРґ 
+    double price;      // С†РµРЅР° 
+    char category[MAX_LENGTH];    // РєР°С‚РµРіРѕСЂРёСЏ
 } Book;
 
 void safeBookFill(char* buf, const char* text, int max_size);
