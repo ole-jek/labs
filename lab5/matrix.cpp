@@ -1,4 +1,4 @@
-#include "matrix.h"
+п»ї#include "matrix.h"
 
 void m_zero(Matrix* A, int m, int n) {
     A->rows = m;
@@ -15,9 +15,9 @@ void m_id(Matrix * A, int n) {
     A->cols = n;
     A->data = new double[n * n];
 
-    for (int i = 0; i < n; ++i) { // идем по строкам
-        for (int j = 0; j < n; ++j) { // идем по столбцам
-            // если индексы совпадают, ставим 1.0, иначе 0.0
+    for (int i = 0; i < n; ++i) { // РёРґРµРј РїРѕ СЃС‚СЂРѕРєР°Рј
+        for (int j = 0; j < n; ++j) { // РёРґРµРј РїРѕ СЃС‚РѕР»Р±С†Р°Рј
+            // РµСЃР»Рё РёРЅРґРµРєСЃС‹ СЃРѕРІРїР°РґР°СЋС‚, СЃС‚Р°РІРёРј 1.0, РёРЅР°С‡Рµ 0.0
             if (i == j) {
                 A->data[i * n + j] = 1.0;
             }
@@ -35,43 +35,43 @@ void m_free(Matrix* A) {
 
 void m_copy(const Matrix* src, Matrix* dst) {
 
-    m_free(dst); // чистим память для той матрицы dst 
+    m_free(dst); // С‡РёСЃС‚РёРј РїР°РјСЏС‚СЊ РґР»СЏ С‚РѕР№ РјР°С‚СЂРёС†С‹ dst 
 
     dst->rows = src->rows;
     dst->cols = src->cols;
 
     int num_of_elements = src->rows * src->cols;
-    dst->data = new double[num_of_elements]; // выделяем нужную память под копируемые элементы
+    dst->data = new double[num_of_elements]; // РІС‹РґРµР»СЏРµРј РЅСѓР¶РЅСѓСЋ РїР°РјСЏС‚СЊ РїРѕРґ РєРѕРїРёСЂСѓРµРјС‹Рµ СЌР»РµРјРµРЅС‚С‹
 
     for (int i = 0; i < num_of_elements; ++i) {
-        dst->data[i] = src->data[i]; // копируем элементы
+        dst->data[i] = src->data[i]; // РєРѕРїРёСЂСѓРµРј СЌР»РµРјРµРЅС‚С‹
     }
 }
 
 int m_width(const Matrix* A) {
-    return A->cols; // выводим кол-во столбцов
+    return A->cols; // РІС‹РІРѕРґРёРј РєРѕР»-РІРѕ СЃС‚РѕР»Р±С†РѕРІ
 }
 
 int m_height(const Matrix* A) {
-    return A->rows; // выводим кол-во строк
+    return A->rows; // РІС‹РІРѕРґРёРј РєРѕР»-РІРѕ СЃС‚СЂРѕРє
 }
 
 double m_get(const Matrix* A, int i, int j) {
-    return A->data[i * A->cols + j]; // выводим элемент по формуле приведенной в заголовчном файле
+    return A->data[i * A->cols + j]; // РІС‹РІРѕРґРёРј СЌР»РµРјРµРЅС‚ РїРѕ С„РѕСЂРјСѓР»Рµ РїСЂРёРІРµРґРµРЅРЅРѕР№ РІ Р·Р°РіРѕР»РѕРІС‡РЅРѕРј С„Р°Р№Р»Рµ
 }
 
 void m_set(Matrix* A, int i, int j, double value) {
-    if (A == nullptr || A->data == nullptr) return; // Защита от NULL
-    if (i < 0 || i >= A->rows || j < 0 || j >= A->cols) return; // Защита от выхода за границы
+    if (A == nullptr || A->data == nullptr) return; // Р—Р°С‰РёС‚Р° РѕС‚ NULL
+    if (i < 0 || i >= A->rows || j < 0 || j >= A->cols) return; // Р—Р°С‰РёС‚Р° РѕС‚ РІС‹С…РѕРґР° Р·Р° РіСЂР°РЅРёС†С‹
 
-    // Формула: индекс = (текущая_строка * общее_количество_столбцов) + текущий_столбец
+    // Р¤РѕСЂРјСѓР»Р°: РёРЅРґРµРєСЃ = (С‚РµРєСѓС‰Р°СЏ_СЃС‚СЂРѕРєР° * РѕР±С‰РµРµ_РєРѕР»РёС‡РµСЃС‚РІРѕ_СЃС‚РѕР»Р±С†РѕРІ) + С‚РµРєСѓС‰РёР№_СЃС‚РѕР»Р±РµС†
     A->data[A->cols * i + j] = value;
 }
 
 int m_add(Matrix* A, const Matrix* B) {
-    if (A->cols == B->cols && A->rows == B->rows) { // проверяем на возможность сложить
+    if (A->cols == B->cols && A->rows == B->rows) { // РїСЂРѕРІРµСЂСЏРµРј РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЃР»РѕР¶РёС‚СЊ
         for (int i = 0; i < A->rows * A->cols; ++i) {
-            A->data[i] += B->data[i]; // удобнее складывать так как они лежат (то бишь одномерно)
+            A->data[i] += B->data[i]; // СѓРґРѕР±РЅРµРµ СЃРєР»Р°РґС‹РІР°С‚СЊ С‚Р°Рє РєР°Рє РѕРЅРё Р»РµР¶Р°С‚ (С‚Рѕ Р±РёС€СЊ РѕРґРЅРѕРјРµСЂРЅРѕ)
         }
         return 0;
     }
@@ -79,7 +79,7 @@ int m_add(Matrix* A, const Matrix* B) {
 }
 void m_neg(Matrix* A) {
     for (int i = 0; i < A->cols * A->rows; ++i) {
-        A->data[i] *= -1; // меняем знак у каждого элемента
+        A->data[i] *= -1; // РјРµРЅСЏРµРј Р·РЅР°Рє Сѓ РєР°Р¶РґРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
     }
 }
 
@@ -92,11 +92,11 @@ int m_mult(const Matrix* A, const Matrix* B, Matrix* dst) {
         dst->cols = B->cols;
         dst->data = new double[dst->rows * dst->cols];
 
-        for (int i = 0; i < A->rows; ++i) { // идем по строкам A
-            for (int j = 0; j < B->cols; ++j) { // идем по столбцам B
+        for (int i = 0; i < A->rows; ++i) { // РёРґРµРј РїРѕ СЃС‚СЂРѕРєР°Рј A
+            for (int j = 0; j < B->cols; ++j) { // РёРґРµРј РїРѕ СЃС‚РѕР»Р±С†Р°Рј B
                 double sum = 0;
-                for (int k = 0; k < A->cols; ++k) { // формула: dst[i][j] = SIGMA(from k = 1 to A->cols) A[i][k] * B[k][j].
-                    // ну короче просто формула умножения матриц я не знаю как ее по человечески в строку записать
+                for (int k = 0; k < A->cols; ++k) { // С„РѕСЂРјСѓР»Р°: dst[i][j] = SIGMA(from k = 1 to A->cols) A[i][k] * B[k][j].
+                    // РЅСѓ РєРѕСЂРѕС‡Рµ РїСЂРѕСЃС‚Рѕ С„РѕСЂРјСѓР»Р° СѓРјРЅРѕР¶РµРЅРёСЏ РјР°С‚СЂРёС† СЏ РЅРµ Р·РЅР°СЋ РєР°Рє РµРµ РїРѕ С‡РµР»РѕРІРµС‡РµСЃРєРё РІ СЃС‚СЂРѕРєСѓ Р·Р°РїРёСЃР°С‚СЊ
                     sum += A->data[i * A->cols + k] * B->data[k * B->cols + j];
                 }
                 dst->data[i * dst->cols + j] = sum;
