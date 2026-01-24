@@ -3,7 +3,7 @@
 #include <cstdio>
 
 void sort(char* pcFirst, int nNumber, int size,
-     void (*Swap)(void*, void*), int (*Compare)(void*, void*) ) {
+     void (*Swap)(void*, void*), int (*Compare)(const void*, const void*) ) {
     for ( int i = 1; i < nNumber; i++ )
         for ( int j = nNumber - 1; j >= i; j-- )
         {
@@ -21,7 +21,7 @@ void swap_str(void* p1, void* p2) {
     *(char**)p2 = temp;
 }
 
-int cmp_str(void* p1, void* p2) {
+int cmp_str(const void* p1, const void* p2) {
     const char* f_str = *(const char**)p1;
     const char* s_str = *(const char**)p2;
     return strcmp(f_str, s_str);
@@ -44,7 +44,7 @@ double integrate(double (*func)(double), double down, double up, int amount) {
 
 int cmp_desc(const void* a, const void* b) { 
     return cmp_num<int>(b, a); // меняем аргументы местами
-}
+} 
 
 void print_max(int* arr, int n) {
     if (n <= 0) {

@@ -61,7 +61,11 @@ double m_get(const Matrix* A, int i, int j) {
 }
 
 void m_set(Matrix* A, int i, int j, double value) {
-    A->data[i * A->cols + j] = value; // выводим элемент по формуле приведенной в заголовчном файле
+    if (A == nullptr || A->data == nullptr) return; // Защита от NULL
+    if (i < 0 || i >= A->rows || j < 0 || j >= A->cols) return; // Защита от выхода за границы
+
+    // Формула: индекс = (текущая_строка * общее_количество_столбцов) + текущий_столбец
+    A->data[A->cols * i + j] = value;
 }
 
 int m_add(Matrix* A, const Matrix* B) {

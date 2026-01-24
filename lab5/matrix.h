@@ -1,12 +1,12 @@
 #ifndef MATRIX_H // защита от повторного включения
 #define MATRIX_H
 
-typedef struct {
+struct Matrix {
     double* data; // указатель на массив double в котором данные будем хранить "одномерно". 
     // обращаемся к элементам через (cols * i + j) - индекс элемента в строке i  и столбце j.
     int rows = 0;
     int cols = 0;
-} Matrix;
+};
 
 void m_zero(Matrix* A, int m, int n);
 void m_id(Matrix* A, int n);

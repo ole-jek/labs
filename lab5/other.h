@@ -2,7 +2,7 @@
 //Прототипы используемых в данном задании функций:
 
 void sort(char* pcFirst, int nNumber, int size,
-     void (*Swap)(void*, void*), int (*Compare)(void*, void*) );
+     void (*Swap)(void*, void*), int (*Compare)(const void*, const void*) );
 
 template <typename T> // если можно шаблоны то так можно место сэкономить сильно. если нет то ну просто две одинаковые функции будут 
 //по функционалу но с разными типами
@@ -16,8 +16,8 @@ double integrate(double (*func)(double), double down, double up, int amount);
 
 template <typename T>
 int cmp_num(const void* p1, const void* p2) {
-    T v1 = *(const T*)p1;
-    T v2 = *(const T*)p2;
+    const T v1 = *(const T*)p1;
+    const T v2 = *(const T*)p2;
     if (v1 > v2) {
         return 1;
     }
@@ -29,7 +29,7 @@ int cmp_num(const void* p1, const void* p2) {
     }
 }
 
-int cmp_str(void* p1, void* p2);
+int cmp_str(const void* p1, const void* p2);
 void swap_str(void* p1, void* p2);
 
 void print_max(int* arr, int n);
