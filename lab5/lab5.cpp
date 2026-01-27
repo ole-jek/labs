@@ -192,8 +192,7 @@ int main()
         printf("\n");
 
         //сортируем
-        sort(reinterpret_cast<char*>(&nAr[0]), nTotal, sizeof(int),
-            swap_num<int>, cmp_num<int>);
+        sort(&nAr[0], nTotal, cmp_num<int>);
 
         /** Печать результатов сортировки */
         printf("отсортрованный массив ");
@@ -227,8 +226,7 @@ int main()
         printf("\n");
 
         //сортируем
-        sort(reinterpret_cast<char*>(&nAr[0]), nTotal, sizeof(double),
-            swap_num<double>, cmp_num<double>);
+        sort(&nAr[0], nTotal, cmp_num<double>);
 
         /** Печать результатов сортировки */
         printf("отсортрованный массив");
@@ -259,7 +257,7 @@ int main()
         }
         printf("\n");
 
-        sort(reinterpret_cast<char*>(&arStr[0]), arTotal, sizeof(char*), swap_str, cmp_str);
+        sort(&arStr[0], arTotal, cmp_str);
 
         printf("массив после: ");
         for (int i = 0; i < arTotal; ++i) {
