@@ -4,5 +4,6 @@
 #include "library.h"
 
 void displayMenu();
+void printGoodbye();
 
 #endif

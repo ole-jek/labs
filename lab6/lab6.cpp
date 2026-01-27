@@ -87,6 +87,7 @@ int main() {
         clearInputBuffer();
         actions[num](lib);
         if (num == 0) {
+            printGoodbye();
             break;
         }
         printf("\n\n");

@@ -6,6 +6,7 @@
 extern int sort_fields[3];
 extern int sort_dirs[3];
 extern int sort_num;
+extern const int GLOBAL_MAX_YEAR;
 
 typedef struct {
 	Book* books;

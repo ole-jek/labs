@@ -1,6 +1,7 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include "book.h"
 
+inline const int GLOBAL_MAX_YEAR = getCurrentYear();
 
 Book* createBook() {
 	Book* new_book = new Book();
@@ -31,33 +32,81 @@ void inputBook(Book* b) {
     char buffer[2048] = { 0 }; // буфер для чтения строки
     printf("введите данные о книге:\n");
 
-    printf("автор: ");
-    if (scanf(" %2047[^\n]", buffer) != 1) { // как и в одной из прошлых лаб используем [^\n] чтобы считать имя целиком а не до пробела
-        printf("ошибка ввода");
-        clearInputBuffer();
-        return;
-    }
-    b->author = new char[strlen(buffer) + 1]; // выделяем память ровно под размер текста + \0
-    strcpy(b->author, buffer);
-    clearInputBuffer();
+    while (1) {
+        printf("автор (макс. 2047 символов): ");
 
-    printf("название: ");
-    if (scanf(" %2047[^\n]", buffer) != 1) { 
-        printf("ошибка ввода");
-        clearInputBuffer();
-        return;
+        if (scanf(" %2047[^\n]", buffer) == 1) {
+            int next_char = getchar();
+
+            if (next_char != '\n' && next_char != EOF) {
+                while (next_char != '\n' && next_char != EOF) {
+                    next_char = getchar();
+                }
+
+                printf("данные были обрезаны под лимит буфера.\n");
+                printf("1 - ввести заново, 2 - оставить как есть: ");
+
+                int choice;
+                if (scanf("%d", &choice) == 1) {
+                    clearInputBuffer();
+                    if (choice == 1) {
+                        continue;
+                    }
+                }
+                else {
+                    clearInputBuffer();
+                }
+            }
+            b->author = my_strdup(buffer);
+            break;
+        }
+        else {
+            printf("ошибка ввода. попробуйте еще раз.\n");
+            clearInputBuffer();
+        }
     }
-    b->title = new char[strlen(buffer) + 1];
-    strcpy(b->title, buffer);
-    clearInputBuffer();
 
     while (1) {
-        printf("год издания (не ранее 868 г. до 2026 г.): "); // оставим логику такой же какой она была в прошлой лабораторной. 
+        printf("название (макс. 2047 символов): ");
+
+        if (scanf(" %2047[^\n]", buffer) == 1) {
+            int next_char = getchar();
+
+            if (next_char != '\n' && next_char != EOF) {
+                while (next_char != '\n' && next_char != EOF) {
+                    next_char = getchar();
+                }
+
+                printf("данные были обрезаны под лимит буфера.\n");
+                printf("1 - ввести заново, 2 - оставить как есть: ");
+
+                int choice;
+                if (scanf("%d", &choice) == 1) {
+                    clearInputBuffer();
+                    if (choice == 1) {
+                        continue;
+                    }
+                }
+                else {
+                    clearInputBuffer();
+                }
+            }
+            b->title = my_strdup(buffer);
+            break;
+        }
+        else {
+            printf("ошибка ввода. попробуйте еще раз.\n");
+            clearInputBuffer();
+        }
+    }
+
+    while (1) {
+        printf("год издания (не ранее 868 г. и до текущего года): "); // оставим логику такой же какой она была в прошлой лабораторной. 
         if (scanf("%d", &b->year) != 1) {
             printf("ошибка! введите число.\n");
 
         }
-        else if (b->year < 868 || b->year > 2026) {
+        else if (b->year < 868 || b->year > GLOBAL_MAX_YEAR) {
             printf("ошибка: некорректный год.\n");
         }
         else {
@@ -67,25 +116,73 @@ void inputBook(Book* b) {
         clearInputBuffer();
     }
 
-    printf("жанр: ");
-    if (scanf(" %2047[^\n]", buffer) != 1) {
-        printf("ошибка ввода");
-        clearInputBuffer();
-        return;
-    }
-    b->genre = new char[strlen(buffer) + 1];
-    strcpy(b->genre, buffer);
-    clearInputBuffer();
+    while (1) {
+        printf("жанр (макс. 2047 символов): ");
 
-    printf("краткое описание: ");
-    if (scanf(" %2047[^\n]", buffer) != 1) { 
-        printf("ошибка ввода");
-        clearInputBuffer();
-        return;
+        if (scanf(" %2047[^\n]", buffer) == 1) {
+            int next_char = getchar();
+
+            if (next_char != '\n' && next_char != EOF) {
+                while (next_char != '\n' && next_char != EOF) {
+                    next_char = getchar();
+                }
+
+                printf("данные были обрезаны под лимит буфера.\n");
+                printf("1 - ввести заново, 2 - оставить как есть: ");
+
+                int choice;
+                if (scanf("%d", &choice) == 1) {
+                    clearInputBuffer();
+                    if (choice == 1) {
+                        continue; // идем на новый круг ввода жанра
+                    }
+                }
+                else {
+                    clearInputBuffer();
+                }
+            }
+            b->genre = my_strdup(buffer);
+            break;
+        }
+        else {
+            printf("ошибка ввода. попробуйте еще раз.\n");
+            clearInputBuffer();
+        }
     }
-    b->summary = new char[strlen(buffer) + 1];
-    strcpy(b->summary, buffer);
-    clearInputBuffer();
+
+    while (1) {
+        printf("краткая сводка (макс. 2047 символов): ");
+
+        if (scanf(" %2047[^\n]", buffer) == 1) {
+            int next_char = getchar();
+
+            if (next_char != '\n' && next_char != EOF) {
+                while (next_char != '\n' && next_char != EOF) {
+                    next_char = getchar();
+                }
+
+                printf("данные были обрезаны под лимит буфера.\n");
+                printf("1 - ввести заново, 2 - оставить как есть: ");
+
+                int choice;
+                if (scanf("%d", &choice) == 1) {
+                    clearInputBuffer();
+                    if (choice == 1) {
+                        continue; // идем на новый круг ввода жанра
+                    }
+                }
+                else {
+                    clearInputBuffer();
+                }
+            }
+            b->summary = my_strdup(buffer);
+            break;
+        }
+        else {
+            printf("ошибка ввода. попробуйте еще раз.\n");
+            clearInputBuffer();
+        }
+    }
 }
 
 void printBook(Book* b) {

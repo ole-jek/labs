@@ -16,3 +16,8 @@ void displayMenu() {
 	printf("0. Выйти из программы.\n");
 	printf("Твой выбор: ");
 }
+
+void printGoodbye()
+{
+	printf("\nпамять очищена. до свидания!\n");
+}

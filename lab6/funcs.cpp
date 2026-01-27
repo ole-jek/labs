@@ -61,3 +61,13 @@ void swap_book(void* p1, void* p2) {
     *b1 = *b2;
     *b2 = temp;
 }
+
+int getCurrentYear() {
+    auto now = std::chrono::system_clock::now();
+
+    std::time_t now_t = std::chrono::system_clock::to_time_t(now);
+
+    std::tm* now_tm = std::localtime(&now_t);
+
+    return 1900 + now_tm->tm_year;
+}
