@@ -31,5 +31,6 @@ void changeBook(Library* lib); // +
 void exitProg(Library* lib); // +
 void showGenre(Library* lib); // +
 void saveHistory(Library* lib);
-
+void fprintEscaped(FILE* f, const char* str);
+void readField(FILE* f, char* buffer, int maxSize);
 #endif

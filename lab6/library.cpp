@@ -86,6 +86,20 @@ void deleteBookAction(Library* lib) { // созданим доп. функцию
 		}
 	}
 }
+void fprintEscaped(FILE* f, const char* str) { // функция для экранирования 
+	if (!str) return;
+	for (int i = 0; str[i]; i++) {
+		if (str[i] == '|') {
+			fprintf(f, "\\|"); // если встретили черту пишем перед ней бэкслеш
+		}
+		else if (str[i] == '\\') {
+			fprintf(f, "\\\\"); // сам бэкслеш тоже надо экранировать
+		}
+		else {
+			fputc(str[i], f);
+		}
+	}
+}
 
 void saveToFile(Library* lib, const char* filename) {
 	FILE* f = fopen(filename, "w"); // "w" - создает файл для записи
@@ -95,11 +109,46 @@ void saveToFile(Library* lib, const char* filename) {
 
 	fprintf(f, "%d\n", lib->count); // в самом начале записываем кол-во элементов картотеки чтоб потом считать
 	for (int i = 0; i < lib->count; ++i) {
-		fprintf(f, "%s|%s|%d|%s|%s\n",
-			lib->books[i].author, lib->books[i].title, lib->books[i].year,
-			lib->books[i].genre, lib->books[i].summary);
+		fprintEscaped(f, lib->books[i].author); 
+		fputc('|', f); // вручную проставляем разделители
+		fprintEscaped(f, lib->books[i].title); 
+		fputc('|', f);
+		fprintf(f, "%d|", lib->books[i].year);
+		fprintEscaped(f, lib->books[i].genre);
+		fputc('|', f);
+		fprintEscaped(f, lib->books[i].summary);
+		fputc('\n', f);
 	}
 	fclose(f);
+}
+
+void readField(FILE* f, char* buffer, int maxSize) { // функция для деэкранирования
+	int i = 0;
+	int ch;
+	while (i < maxSize - 1) {
+		ch = fgetc(f); // берем символ из буфера и проверяем его на \n или | (ну и на обрыв ввода) 
+		if (ch == EOF || ch == '\n' || ch == '|') {
+			// если перед чертой был бэкслеш то это не конец поля
+			if (ch == '|' && i > 0 && buffer[i - 1] == '\\') {
+				buffer[i - 1] = '|'; // заменяем \| на просто |
+				continue;
+			}
+			break;
+		}
+		if (ch == '\\') {
+			int next = fgetc(f);
+			if (next == '\\') {
+				buffer[i++] = '\\'; // записываем один бэкслеш вместо двух
+				continue;
+			}
+			else {
+				ungetc(next, f); // возвращаем символ в поток, если это не \\ или \|
+			}
+		}
+
+		buffer[i++] = (char)ch;
+	}
+	buffer[i] = '\0';
 }
 
 void loadFromFile(Library* lib, const char* filename) {
@@ -127,7 +176,7 @@ void loadFromFile(Library* lib, const char* filename) {
 		fclose(f);
 		return;
 	}
-
+		
 	lib->count = new_count; // теперь готовим массив нужного нам размера
 	lib->capacity = new_count;
 	lib->books = new Book[lib->capacity];
@@ -142,25 +191,21 @@ void loadFromFile(Library* lib, const char* filename) {
 		lib->books[i].summary = nullptr;
 		lib->books[i].year = 0;
 
-		if (fscanf(f, "%2047[^|]|", buffer) == 1) {
-			lib->books[i].author = my_strdup(buffer);
-		}
+		readField(f, buffer, 2048);
+		lib->books[i].author = my_strdup(buffer);
 
-		if (fscanf(f, "%2047[^|]|", buffer) == 1) {
-			lib->books[i].title = my_strdup(buffer);
-		}
+		readField(f, buffer, 2048);
+		lib->books[i].title = my_strdup(buffer);
 
 		if (fscanf(f, "%d|", &lib->books[i].year) != 1) {
-			lib->books[i].year = 0; 
+			lib->books[i].year = 0;
 		}
 
-		if (fscanf(f, "%2047[^|]|", buffer) == 1) {
-			lib->books[i].genre = my_strdup(buffer);
-		}
-		// читаем аннотацию до конца строки '\n'
-		if (fscanf(f, "%2047[^\n]\n", buffer) == 1) {
-			lib->books[i].summary = my_strdup(buffer);
-		}
+		readField(f, buffer, 2048);
+		lib->books[i].genre = my_strdup(buffer);
+
+		readField(f, buffer, 2048);
+		lib->books[i].summary = my_strdup(buffer);
 	}
 
 	fclose(f);
@@ -177,10 +222,10 @@ void saveToFileAction(Library* lib) {
 	printf("введите имя файла для сохранения (например, lib.txt): ");
 
 	while (1) {
-		if (scanf(" %255s", filename) == 1) {
+		if (scanf(" %255s", filename) == 1) { 
 			int next_char = getchar(); 
 
-			if (next_char != '\n' && next_char != EOF) {
+			if (next_char != '\n' && next_char != EOF) { // проверяем имя файла на длину
 				while (next_char != '\n' && next_char != EOF) {
 					next_char = getchar();
 				}
@@ -189,7 +234,7 @@ void saveToFileAction(Library* lib) {
 				continue;
 			}
 
-			const char* dot = strrchr(filename, '.');
+			const char* dot = strrchr(filename, '.'); // проверяем на наличие .txt через strrchr 
 			if (!dot || strcmp(dot, ".txt") != 0) {
 				printf("ошибка: файл должен иметь расширение .txt\n");
 				printf("введите имя заново: ");
@@ -215,7 +260,7 @@ void loadFromFileAction(Library* lib) {
 		if (scanf(" %255s", filename) == 1) {
 			int next_char = getchar();
 
-			if (next_char != '\n' && next_char != EOF) {
+			if (next_char != '\n' && next_char != EOF) { // проверяем имя файла на длину
 				while (next_char != '\n' && next_char != EOF) {
 					next_char = getchar();
 				}
@@ -224,7 +269,7 @@ void loadFromFileAction(Library* lib) {
 				continue;
 			}
 
-			const char* dot = strrchr(filename, '.');
+			const char* dot = strrchr(filename, '.'); // проверяем на наличие .txt через strrchr 
 			if (!dot || strcmp(dot, ".txt") != 0) {
 				printf("ошибка: файл должен иметь расширение .txt\n");
 				printf("введите имя заново: ");
@@ -237,18 +282,20 @@ void loadFromFileAction(Library* lib) {
 			clearInputBuffer();
 		}
 	}
+	saveHistory(lib);
+	loadFromFile(lib, filename);
 }
 
 void exitProg(Library* lib) {
 	if (lib == nullptr) return;
 
 	for (int i = 0; i < lib->count; ++i) {
-		freeBookContent(&lib->books[i]);
+		freeBookContent(&lib->books[i]); // чистим память для содержимого каждой книги
 
 	}
 
 	if (lib->books != nullptr) {
-		delete[] lib->books;
+		delete[] lib->books; // чистим память выделенную под сам массив структур книг
 	}
 
 	delete lib;
@@ -437,9 +484,9 @@ void sortLib(Library* lib) {
 		return;
 	}
 
-	printf("введите количество полей для сортировки (1-3): ");
+	printf("введите количество полей для сортировки (1-3): "); // запрашиваем количество полей
 	if (scanf("%d", &sort_num) != 1) sort_num = 1;
-	if (sort_num < 1) {
+	if (sort_num < 1) { 
 		printf("введенное число меньше возможного. засчитаем его за 1 по умолчанию");
 		sort_num = 1;
 	}
@@ -450,7 +497,7 @@ void sortLib(Library* lib) {
 
 	for (int i = 0; i < sort_num; ++i) {
 		printf("\nКритерий №%d:\n", i + 1);
-		printf("Выберите поле (1-автор, 2-название, 3-год): ");
+		printf("Выберите поле (1-автор, 2-название, 3-год): "); // выбираем конкретное поле 
 		while (1) {
 			if (scanf("%d", &sort_fields[i]) != 1 || sort_fields[i] < 1 || sort_fields[i] > 3) {
 				printf("\nошибка. введите число от 1 до 3\n");
@@ -459,7 +506,7 @@ void sortLib(Library* lib) {
 			}
 			break;
 		}
-		printf("Направление (1-возрастание, -1-убывание): ");
+		printf("Направление (1-возрастание, -1-убывание): "); // запрашиваем направление сортировки
 		while (1) {
 			if (scanf("%d", &sort_dirs[i]) != 1 ||  ( sort_dirs[i] != 1 && sort_dirs[i] != -1) ) {
 				printf("\nошибка. введите число 1 для возрастания или -1 для убывания\n");
